@@ -115,6 +115,7 @@ class reds:
         except ValueError:
             return self.abort("Instance size not in list!")
 
+        # Line no 119 to 160 , if scheduling is used
         if self.vars['schedule_enabled']:
             self.info("Checking to see if we are in a scheduled uptime")
 
