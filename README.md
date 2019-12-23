@@ -2,6 +2,9 @@
 ## Terraform - Auto-Scale for RDS Instances
 ### This can save you up to 50% on your RDS costs, and avoid headaches on traffic spikes!
 
+
+### Work Based on : https://github.com/arielsepulveda/ReDS_terraform
+
 ![reds](https://cloud.githubusercontent.com/assets/20051003/22879727/9cda7ed2-f1df-11e6-817e-48f3b27b62f3.jpg)
 
 ### Features
