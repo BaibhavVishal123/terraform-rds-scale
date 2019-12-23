@@ -100,6 +100,7 @@ class reds:
         if self.details['DBInstanceStatus'] != 'available':
             return self.abort("In middle of an operation already!")
 
+        # TODO: comment out this if block
         if not self.details['MultiAZ']:
             return self.abort("Unable to work on singleAZ RDS!")
 
@@ -168,14 +169,19 @@ class reds:
 
         if self.alarm_status['MetricAlarms'][0]['StateValue'] == 'ALARM':
             self.info("High-CPU Alarm status is: ALARM")
+            self.info("Attempting Multi-AZ")
+            # TODO: ENABLE MULTI AZ
             self.info("Attempting scale up one size!")
             return self.scale('scale_up', int(self.on_index+1))
 
         if self.alarm_status['MetricAlarms'][1]['StateValue'] == 'ALARM':
             self.info("Low-CPU Alarm status is: ALARM")
+            self.info("Attempting Multi-AZ")
+            # TODO: ENABLE MULTI AZ
             self.info("Attempting scale down one size!")
             return self.scale('scale_down', int(self.on_index-1))
 
+        # TODO: Disable Multi-AZ
         return self.abort("Nothing to do")
 
     def assert_cooldown_expired(self, reason):
