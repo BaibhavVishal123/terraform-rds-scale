@@ -9,3 +9,4 @@ tmp/*
 lambda
 lambda/*
 .vscode
+reds/deps

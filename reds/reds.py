@@ -20,6 +20,7 @@ class reds:
         self.events = None
         self.result = None
         self.on_index = None
+        self.multi_az = None
 
     def lambda_startup(self):
         self.rds_client = boto3.client('rds')
@@ -100,9 +101,11 @@ class reds:
         if self.details['DBInstanceStatus'] != 'available':
             return self.abort("In middle of an operation already!")
 
-        # TODO: comment out this if block
+        # TODO: DONE change this if block
         if not self.details['MultiAZ']:
-            return self.abort("Unable to work on singleAZ RDS!")
+            self.multi_az = False
+        else:
+            self.multi_az = True
 
         try:
             self.on_index = self.vars['instance_sizes'].index(
@@ -169,20 +172,36 @@ class reds:
 
         if self.alarm_status['MetricAlarms'][0]['StateValue'] == 'ALARM':
             self.info("High-CPU Alarm status is: ALARM")
-            self.info("Attempting Multi-AZ")
-            # TODO: ENABLE MULTI AZ
+            self.info("Attempting Multi-AZ Enable")
+            # TODO: DONE ENABLE MULTI AZ
+            if not self.details['MultiAZ']:
+                return self.change_az(True)
             self.info("Attempting scale up one size!")
             return self.scale('scale_up', int(self.on_index+1))
 
         if self.alarm_status['MetricAlarms'][1]['StateValue'] == 'ALARM':
             self.info("Low-CPU Alarm status is: ALARM")
-            self.info("Attempting Multi-AZ")
-            # TODO: ENABLE MULTI AZ
+            self.info("Attempting Multi-AZ Enable")
+            # TODO: DONE ENABLE MULTI AZ
+            if not self.details['MultiAZ']:
+                return self.change_az(True)
             self.info("Attempting scale down one size!")
             return self.scale('scale_down', int(self.on_index-1))
 
-        # TODO: Disable Multi-AZ
+        # TODO: DONE Disable Multi-AZ
+        if self.details['MultiAZ']:
+            self.info("Attempting Multi-AZ Disable")
+            return self.change_az(False)
+
         return self.abort("Nothing to do")
+
+    def change_az(self, azEnabled):
+        amz_res = self.rds_client.modify_db_instance(
+            DBInstanceIdentifier=self.vars['rds_identifier'],
+            # DBInstanceClass=self.result['Message'],
+            MultiAZ=azEnabled,
+            ApplyImmediately=True)
+        self.info("AMZ response {}".format(amz_res))
 
     def assert_cooldown_expired(self, reason):
         cooldown = self.vars[reason]['cooldown']
